@@ -1,29 +1,56 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'"/>
     <script type="text/javascript" src="cordova.js"></script>
+    <script src="js/socket.io-1.2.1.js"></script>
+    <script src="js/client.js"></script>
+    <script src="js/config.js"></script>        
     <script type="text/javascript">
-    var map;
-    document.addEventListener("deviceready", function() {
+    
+	var map;
+	var client = new Client();
+   
+	document.addEventListener("deviceready", function() {
       var div = document.getElementById("map_canvas");
 
       // Initialize the map view
       map = plugin.google.maps.Map.getMap(div);
 
+		/*
+		plugin.google.maps.event.
+		
+		CAMERA_CHANGE: "camera_change"
+		CAMERA_IDLE: "camera_idle"
+		INDOOR_BUILDING_FOCUSED: "indoor_building_focused"
+		INDOOR_LEVEL_ACTIVATED: "indoor_level_activated"
+		INFO_CLICK: "info_click"
+		MAP_CLICK: "click"
+		MAP_CLOSE: "map_close"
+		MAP_LOADED: "map_loaded"
+		MAP_LONG_CLICK: "long_click"
+		MAP_READY: "map_ready"
+		MAP_WILL_MOVE: "will_move"
+		MARKER_CLICK: "click"
+		MARKER_DRAG: "drag"
+		MARKER_DRAG_END: "drag_end"
+		MARKER_DRAG_START: "drag_start"
+		MY_LOCATION_BUTTON_CLICK: "my_location_button_click"
+		MY_LOCATION_CHANGE: "my_location_change"
+		OVERLAY_CLICK: "overlay_click"
+		
+		*/
       // Wait until the map is ready status.
       map.addEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
+	 
     }, false);
 
-    function onMapReady() {
-      var button = document.getElementById("button");
-      button.addEventListener("click", onBtnClicked, false);
-    }
 
-    function onBtnClicked() {
-      //map.showDialog();
-	  var pos = new plugin.google.maps.Map.getMyLocation(showPosition, onError);
+    function onMapReady() {
+		map.getMyLocation(showPosition, onError);
+		//map.removeEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
     }
 	
 	function showPosition(position) {
@@ -52,10 +79,17 @@
 		map.animateCamera({
 		  'target': myLocation,
 		  'tilt': 60,
-		  'zoom': 18,
+		  'zoom': 16,
 		  'bearing': 140,
-		  'duration': 10000 // 10 seconds
+		  'duration': 0 // 10 seconds
 		});		
+		
+		setTimeout( function(){ document.getElementById("map_canvas").style.display = ''; } , 1000 );
+		
+		
+		/* seto el bonbre del cliente */
+		client.setName( 'Pepe' );
+    	client.connect();
 	
 	}		
 	
@@ -68,7 +102,7 @@
   </head>
   <body>
     <h3>Donde Estas?</h3>
-    <div style="width:100%;height:400px" id="map_canvas"></div>
+    <div style="width:100%;height:400px;display:none;" id="map_canvas"></div>
     <button id="button">Marcar Posición</button>
   </body>
 </html>
