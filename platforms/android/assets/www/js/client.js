@@ -154,12 +154,20 @@ Client.prototype.connect = function() {
 Client.prototype.heartbeat = function (self) {
 	
 	function getLocation() {
+		/*
+		watchID = navigator.geolocation.watchPosition(function(position){
+			console.log(JSON.stringify( position, null, 4 ));
+			self.latitud = position.latLng.lat;
+			self.longitud = position.latLng.lng; 			
+		}, onError, optsLocation ); 
+		*/
 		
-		map.getMyLocation(function(position){
+		map.getMyLocation( optsLocation , function(position){
 			console.log(JSON.stringify( position, null, 4 ));
 			self.latitud = position.latLng.lat;
 			self.longitud = position.latLng.lng; 			
 		}, onError);
+		/* */
 		
 	}
 

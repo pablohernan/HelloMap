@@ -47,9 +47,10 @@
 	 
     }, false);
 
-
+	var optsLocation = { maximumAge: 5000, timeout: 5000, enableHighAccuracy: true };		
+		
     function onMapReady() {
-		map.getMyLocation(showPosition, onError);
+		map.getMyLocation(optsLocation , showPosition, onError);
 		//map.removeEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
     }
 	
