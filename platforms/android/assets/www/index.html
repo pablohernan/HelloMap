@@ -11,7 +11,9 @@
     <script type="text/javascript">
     
 	var map;
+	var myMarker;
 	var client = new Client();
+	
    
 	document.addEventListener("deviceready", function() {
       var div = document.getElementById("map_canvas");
@@ -43,7 +45,8 @@
 		
 		*/
       // Wait until the map is ready status.
-      map.addEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
+	  map.addEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
+      //map.addEventListener(plugin.google.maps.event.MAP_LOADED, onMapReady);
 	 
     }, false);
 
@@ -65,32 +68,43 @@
 	
 	function loadMyLocation( lat , lng ){
 		const myLocation = new plugin.google.maps.LatLng( lat , lng );
-		map.addMarker({
-			'position': myLocation,
-			'title': "Soy yo!",
-			'icon': {
-						'url': 'www/img/cemetery_v_L_8x.png'
-					}			
-			}, 
-			function(marker) {
-				marker.showInfoWindow();
-			}
-		);	
 		
-		map.animateCamera({
-		  'target': myLocation,
-		  'tilt': 60,
-		  'zoom': 16,
-		  'bearing': 140,
-		  'duration': 0 // 10 seconds
-		});		
+		//myMarker = 
 		
-		setTimeout( function(){ document.getElementById("map_canvas").style.display = ''; } , 1000 );
-		
-		
-		/* seto el bonbre del cliente */
-		client.setName( 'Pepe' );
-    	client.connect();
+		if( ! myMarker ){
+			map.addMarker({
+				'position': myLocation,
+				'title': "Soy yo!",
+				'icon': {
+							'url': 'www/img/people_1.png'
+						}			
+				}, 
+				function(marker) {
+					/* soy yo */
+					myMarker = marker; 
+					/* title */
+					marker.showInfoWindow();
+				}
+			);	
+
+			map.animateCamera({
+			  'target': myLocation,
+			  'tilt': 60,
+			  'zoom': 16,
+			  'bearing': 140,
+			  'duration': 0 // 10 seconds
+			});	
+			
+			//map.showDialog();
+			
+			//setTimeout( function(){ document.getElementById("map_canvas").style.display = ''; } , 1000 );
+			/* seto el bonbre del cliente */
+			client.setName( 'Pepe' );
+			client.connect();			
+			
+		}else{
+			myMarker.setPosition( myLocation );
+		}
 	
 	}		
 	
@@ -100,10 +114,30 @@
 	
 	
     </script>
+    
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+}
+#map_canvas {
+  position: absolute;
+  top:0;
+  width: 100%;
+  height: 100%;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  border:none;
+}
+
+.debug{ display:none;}
+
+</style>    
+    
   </head>
   <body>
-    <h3>Donde Estas?</h3>
-    <div style="width:100%;height:400px;display:none;" id="map_canvas"></div>
-    <button id="button">Marcar Posición</button>
+    <h3 class="debug">Donde Estas?</h3>
+    <div id="map_canvas"></div>
+    <button id="button" class="debug">Marcar Posición</button>
   </body>
 </html>

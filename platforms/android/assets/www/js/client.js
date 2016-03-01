@@ -44,7 +44,7 @@ Client.prototype.connect = function() {
   console.log("Websocket connection string:", connString, config.wsclientopts);
 
   var self = this;
-  self.markets=[];
+  self.markers=[];
 
   this.socket = io.connect(connString, config.wsclientopts);
 
@@ -108,36 +108,60 @@ Client.prototype.connect = function() {
 			clientesFormatada += ' - status : ' +  data.clientes[i].status + '<br>';	
 			
 			/* Adiciona o actuliza los makers en el mapa */
-			//var index = self.markets.indexOf( data.clientesInfo[i].name );
-			/*
-			if( ! self.markets[ data.clientes[i].id ] ){
-				self.markets[ data.clientes[i].id ] = mapa.addMaker( data.clientes[i].latitud , data.clientes[i].longitud , data.clientes[i].name );
-			}else{
-				mapa.changePosition( self.markets[ data.clientes[i].id ] , data.clientes[i].latitud , data.clientes[i].longitud );
+			//var index = self.markers.indexOf( data.clientesInfo[i].name );
+			/**/
+			
+			
+			if( self.getId() != data.clientes[i].id ){ // no soy yo 
+				
+				const location = new plugin.google.maps.LatLng( data.clientes[i].latitud , data.clientes[i].longitud );
+				if( ! self.markers[ data.clientes[i].id ] ){ // creo
+					//self.markers[ data.clientes[i].id ] = mapa.addMaker( data.clientes[i].latitud , data.clientes[i].longitud , data.clientes[i].name );
+					
+					map.addMarker({
+																'position': location,
+																'title': data.clientes[i].name,
+																'icon': {
+																			'url': 'www/img/people_2.png'
+																		}			
+																}, 
+																function(marker) {
+																	/* guardo el marker en el array */
+																	self.markers[ data.clientes[i].id ] 
+																	
+																	marker.showInfoWindow();
+																}
+															);	
+						
+					
+				}else{ // actualizo posicion
+					//mapa.changePosition( self.markers[ data.clientes[i].id ] , data.clientes[i].latitud , data.clientes[i].longitud );
+					self.markers[ data.clientes[i].id ].setPosition( location );
+				}
 			}
-			*/
-			/* Adiciona o actuliza los makers en el mapa */
+			
+			/* Adiciona o actualiza los makers en el mapa */
 					
 		}
 		
 		/* Limpio */
 		/* deleteMaker */
 		var idsDel=[];
-		for (var idSckt in self.markets) {
-			//alert(self.markets[idSckt]);
+		for (var idSckt in self.markers) {
+			//alert(self.markers[idSckt]);
 			var existe = false;
 			for( var x=0; x<data.clientes.length ; x++ ){
 				if( idSckt == data.clientes[x].id )
 					existe = true;
 			}
 			if( !existe && idSckt !=  self.getId ){ // si no existe y es diferente de mi id lo borro
-				mapa.deleteMaker( self.markets[idSckt] ); // aqui solo borro el maker contenido en el array
+				self.markers[idSckt].remove(); // aqui solo borro el maker contenido en el array
 				idsDel.push( idSckt );
 			}
 		}
 		/* ids borrados*/
 		for( var y=0; y<idsDel.length ; y++ ){
-			delete self.markets[ idsDel[y] ];
+			delete self.markers[ idsDel[y] ];
 		}
 		/* deleteMaker */
 					
@@ -157,15 +181,20 @@ Client.prototype.heartbeat = function (self) {
 		/*
 		watchID = navigator.geolocation.watchPosition(function(position){
 			console.log(JSON.stringify( position, null, 4 ));
-			self.latitud = position.latLng.lat;
-			self.longitud = position.latLng.lng; 			
+			self.latitud = position.coords.lat;
+			self.longitud = position.coords.lng; 			
 		}, onError, optsLocation ); 
 		*/
 		
 		map.getMyLocation( optsLocation , function(position){
 			console.log(JSON.stringify( position, null, 4 ));
 			self.latitud = position.latLng.lat;
-			self.longitud = position.latLng.lng; 			
+			self.longitud = position.latLng.lng; 
+			
+			/* actualizo mi posicion */
+			const myLocation = new plugin.google.maps.LatLng( position.latLng.lat , position.latLng.lng );
+			myMarker.setPosition( myLocation  );
+						
 		}, onError);
 		/* */
 		
